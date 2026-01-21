@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Sidebar and Main Content Wrapper -->
+    <div class="flex h-screen bg-gray-200">
+        <!-- Sidebar -->
+        <div class="bg-blue-800 text-white w-64 flex-shrink-0">
+            <div class="p-4 border-b border-blue-700">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-hotel text-2xl"></i>
+                    <span class="text-xl font-bold">HostelPro</span>
+                </div>
+            </div>
+            <nav class="mt-6">
+                <div class="px-4 space-y-1">
+                    <a href="#" class="flex items-center px-4 py-3 text-white bg-blue-900 rounded-lg" data-page="dashboard">
+                        <i class="fas fa-tachometer-alt w-6"></i>
+                        <span class="ml-3">Dashboard</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-blue-100 hover:bg-blue-700 rounded-lg" data-page="students">
+                        <i class="fas fa-users w-6"></i>
+                        <span class="ml-3">Students</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-blue-100 hover:bg-blue-700 rounded-lg" data-page="rooms">
+                        <i class="fas fa-bed w-6"></i>
+                        <span class="ml-3">Rooms</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-blue-100 hover:bg-blue-700 rounded-lg" data-page="mess">
+                        <i class="fas fa-utensils w-6"></i>
+                        <span class="ml-3">Mess</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-blue-100 hover:bg-blue-700 rounded-lg" data-page="payments">
+                        <i class="fas fa-money-bill-wave w-6"></i>
+                        <span class="ml-3">Payments</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-blue-100 hover:bg-blue-700 rounded-lg" data-page="staff">
+                        <i class="fas fa-user-tie w-6"></i>
+                        <span class="ml-3">Staff</span>
+                    </a>
+                    <a href="#" class="flex items-center px-4 py-3 text-blue-100 hover:bg-blue-700 rounded-lg" data-page="reports">
+                        <i class="fas fa-chart-bar w-6"></i>
+                        <span class="ml-3">Reports</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Navigation -->
+            <header class="bg-white shadow-sm">
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center">
+                        <button class="text-gray-500 focus:outline-none lg:hidden">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <h1 class="ml-4 text-xl font-semibold text-gray-800" id="page-title">Dashboard</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        </div>
+                        <div class="relative">
+                            <button class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                            </button>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="Admin" class="h-8 w-8 rounded-full">
+                            <span class="text-sm font-medium text-gray-700">Admin</span>
+                            <i class="fas fa-chevron-down text-xs text-gray-500"></i>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100">
+                <div class="container mx-auto px-6 py-8">
+                    <div id="page-content">
+                        <!-- Content will be loaded dynamically -->
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-green-500 text-white px-6 py-3 rounded-lg shadow-xl hidden transform transition-all duration-300 ease-in-out">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="toast-message">Operation completed successfully!</span>
+            <button id="close-toast" class="ml-4 text-white hover:text-gray-200 focus:outline-none">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module">
+        // Import the app module
+        import { showPage } from './js/app.js';
+        
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Show dashboard by default
+            showPage('dashboard');
+            
+            // Set up sidebar navigation
+            document.querySelectorAll('[data-page]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = e.currentTarget.getAttribute('data-page');
+                    showPage(page);
+                    
+                    // Update active state
+                    document.querySelectorAll('[data-page]').forEach(item => {
+                        item.classList.remove('text-white', 'bg-blue-900');
+                        item.classList.add('text-blue-100', 'hover:bg-blue-700');
+                    });
+                    e.currentTarget.classList.add('text-white', 'bg-blue-900');
+                    e.currentTarget.classList.remove('text-blue-100', 'hover:bg-blue-700');
+                    
+                    // Update page title
+                    const pageTitle = e.currentTarget.querySelector('span').textContent;
+                    document.getElementById('page-title').textContent = pageTitle;
+                });
+            });
+            
+            // Close toast notification
+            document.getElementById('close-toast')?.addEventListener('click', () => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            });
+            
+            // Mobile menu toggle
+            const mobileMenuButton = document.querySelector('[aria-label="Toggle sidebar"]');
+            const sidebar = document.querySelector('.sidebar');
+            
+            if (mobileMenuButton && sidebar) {
+                mobileMenuButton.addEventListener('click', () => {
+                    sidebar.classList.toggle('-translate-x-full');
+                });
+            }
+            
+            console.log('Hostel Management System initialized');
+        });
+        
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            
+            // Set message and style based on type
+            toastMessage.textContent = message;
+            
+            // Reset classes
+            toast.className = 'fixed bottom-6 right-6 px-6 py-3 rounded-lg shadow-xl flex items-center transform transition-all duration-300 ease-in-out';
+            
+            // Add type-specific classes
+            if (type === 'success') {
+                toast.classList.add('bg-green-500', 'text-white');
+                toast.innerHTML = `
+                    <i class="fas fa-check-circle mr-2"></i>
+                    <span id="toast-message">${message}</span>
+                    <button id="close-toast" class="ml-4 text-white hover:text-gray-200 focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+            } else if (type === 'error') {
+                toast.classList.add('bg-red-500', 'text-white');
+                toast.innerHTML = `
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <span id="toast-message">${message}</span>
+                    <button id="close-toast" class="ml-4 text-white hover:text-gray-200 focus:outline-none">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+            }
+            
+            // Show toast
+            toast.classList.remove('hidden', 'opacity-0', 'translate-y-4');
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 5000);
+            
+            // Re-attach close event listener
+            const closeButton = document.getElementById('close-toast');
+            if (closeButton) {
+                closeButton.addEventListener('click', () => {
+                    toast.classList.add('opacity-0', 'translate-y-4');
+                    setTimeout(() => toast.classList.add('hidden'), 300);
+                });
+            }
+        }
+        
+        // Global error handler
+        window.addEventListener('error', (event) => {
+            console.error('Global error:', event.error);
+            showToast('An error occurred. Please check the console for details.', 'error');
+        });
+        
+        // Make showToast globally available
+        window.showToast = showToast;
+    </script>
+</body>
+</html>
